@@ -77,6 +77,38 @@ const initializeTodoist = (todoist: ISettingsForm['todoist']) => {
         })
 
     })
+        // @ts-ignore The requirement to return a void can be ignored
+    logseq.Editor.registerSlashCommand('Agenda: Upload to todoist', async ({ uuid }) => {
+      const settings = getInitialSettings()
+      const { todoist } = settings
+      const block = await logseq.Editor.getBlock(uuid)
+      if (!block?.marker) return logseq.UI.showMsg('This block is not a task', 'error')
+      if (block?.properties?.todoistId) return logseq.UI.showMsg('This task has already been uploaded,\nplease do not upload it again', 'error')
+      const event = await transformBlockToEvent(block!, settings)
+
+      const priority = findKey(PRIORITY_MAP, v => v === event.priority)
+
+      let params: AddTaskArgs = {
+        content: event.addOns.contentWithoutTime?.split('\n')?.[0],
+        description: block?.properties?.todoistDesc,
+        priority,
+      }
+      if (event.addOns.allDay === true) params.dueDate = dayjs(event.addOns.start).format('YYYY-MM-DD')
+      if (event.addOns.allDay === false) params.dueDatetime = dayjs.utc(event.addOns.start).format()
+      if (todoist?.project) params.projectId = todoist.project
+      if (todoist?.label) params.labels = [todoist.label]
+
+      createTask(params)
+        ?.then(async task => {
+          await updateBlock(event, task)
+          return logseq.UI.showMsg('Upload task to todoist success')
+        })
+        .catch(err => {
+          logseq.UI.showMsg('Upload task to todoist failed', 'error')
+          console.error('[faiz:] === Upload task to todoist failed', err)
+        })
+
+    })
   }
 }
 
