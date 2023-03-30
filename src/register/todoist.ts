@@ -46,7 +46,7 @@ const initializeTodoist = (todoist: ISettingsForm['todoist']) => {
     })
 
     // @ts-ignore The requirement to return a void can be ignored
-    logseq.Editor.registerBlockContextMenuItem('Agenda: Upload to todoist', async ({ uuid }) => {
+    logseq.Editor.registerBlockContextMenuItem('Agenda: Upload to Todoist', async ({ uuid }) => {
       const settings = getInitialSettings()
       const { todoist } = settings
       const block = await logseq.Editor.getBlock(uuid)
