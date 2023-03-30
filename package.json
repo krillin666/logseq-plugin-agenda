@@ -1,6 +1,6 @@
 {
   "name": "logseq-plugin-agenda",
-  "version": "2.15.0",
+  "version": "1.0.0",
   "main": "dist/index.html",
   "private": true,
   "logseq": {
